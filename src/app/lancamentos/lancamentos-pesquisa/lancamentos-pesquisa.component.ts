@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { LancamentoService, LancamentoFiltro } from '../lancamento.service';
+import { LazyLoadEvent, ConfirmationService } from 'primeng/components/common/api';
+import { ToastyService } from 'ng2-toasty';
 
 @Component({
   selector: 'app-lancamentos-pesquisa',
@@ -7,27 +10,54 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LancamentosPesquisaComponent implements OnInit {
 
-  lancamentos = [
-    {
-      tipo: 'DESPESA', descricao: 'Compra de pão', dataVencimento: '30/06/2019',
-      dataPagamento: null, valor: 4.55, pessoa: 'Padaria do José'
-    },
-    {
-      tipo: 'RECEITA', descricao: 'Venda de Software', dataVencimento: '30/06/2019',
-      dataPagamento: '20/09/2019', valor: 80000, pessoa: 'Login'
-    },
-    {
-      tipo: 'DESPESA', descricao: '/impostos', dataVencimento: '30/06/2019',
-      dataPagamento: null, valor: 15469, pessoa: 'Ministério da Fazenda'
-    },
-    {
-      tipo: 'RECEITA', descricao: 'Venda de Carro', dataVencimento: '20/10/2019',
-      dataPagamento: null, valor: 40000, pessoa: 'Maria'
-    }
-  ];
-  constructor() { }
+  totalRegistros = 0;
+  filtro = new LancamentoFiltro();
+  lancamentos = [];
+  @ViewChild('tabela', null) grid: any;
+
+  constructor(private lancamentoService: LancamentoService,
+    private toasty: ToastyService,
+    private confirmation: ConfirmationService
+      ) { }
 
   ngOnInit() {
+    //this.pesquisar();
+  }
+
+  pesquisar(pagina = 0) {
+    this.filtro.pagina = pagina;
+    this.lancamentoService.pesquisar(this.filtro)
+      .toPromise()
+      .then(response => {
+        const resp = response.json();
+        this.lancamentos = resp.content;
+        // const totalRegistros = resp.totalElements;
+      })
+    //.subscribe(lancamentos => this.lancamentos = lancamentos);
+
+  }
+  aoMudarPagina(event: LazyLoadEvent) {
+    const pagina = event.first / event.rows;
+    this.pesquisar(pagina);
+  }
+
+  confirmarExclusao(lancamento: any){
+    this.confirmation.confirm({
+      message: 'Tem certeza que deseja excluir?',
+      accept: () => {
+        this.excluir(lancamento);
+      }
+    });  
+  }
+
+  excluir(lancamento: any) {
+    this.lancamentoService.excluir(lancamento.codigo);
+    if (this.grid.first == 0) {
+        this.pesquisar();
+    } else {
+      this.grid.first = 0;
+    }
+    this.toasty.success('Lançamento excluido com sucesso!');
   }
 
 }

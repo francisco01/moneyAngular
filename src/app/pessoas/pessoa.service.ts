@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Pessoa } from '../core/model';
 
 
 export class PessoaFiltro {
@@ -14,11 +14,11 @@ export class PessoaFiltro {
 })
 export class PessoaService {
 
-  PessoaUrl = 'http://localhost:8080/pessoas';
+  pessoaUrl = 'http://localhost:8080/pessoas';
 
   constructor(private http: HttpClient) { }
 
-  pesquisar(filtro: PessoaFiltro): Observable<any>{
+  pesquisar(filtro: PessoaFiltro): Promise<any>{
 
     const params= new URLSearchParams();
     const headers = new Headers();
@@ -31,11 +31,39 @@ export class PessoaService {
       params.set('nome', filtro.nome);
     }
 
-    return this.http.get(`${this.PessoaUrl}?resumo`, {search: params});
+    return this.http.get(`${this.pessoaUrl}?resumo`, {search: params})
+    .toPromise()
+    .then(response => {
+      const pessoas = response.content;
+      const resultado = {
+        pessoas,
+        total: response.totalElements
+      };
+      return resultado;
+    });
 
-  } 
+  }
 
-  listarTodas():Observable<any>{
-    return this.http.get(`${this.PessoaUrl}`);
+  listarTodas(): Promise<any> {
+    return this.http.get(`${this.pessoaUrl}`)
+    .toPromise()
+    .then(response => response);
+  }
+
+  excluir(codigo: number): Promise<any>{
+    return this.http.delete(`${this.pessoaUrl}/${codigo}`)
+    .toPromise()
+    .then(() => null);
+  }
+
+  alterarStatus(codigo: number, ativo: boolean): Promise<any>{
+    return this.http.put(`${this.pessoaUrl}/${codigo}/ativo`, ativo)
+    .toPromise()
+    .then(() => null);
+  }
+  salvar(pessoa: Pessoa): Promise<any> {
+    return this.http.post(`${this.pessoaUrl}`, pessoa)
+    .toPromise()
+    .then(response => response);
   }
 }

@@ -21,7 +21,7 @@
         <p-table [value]="pessoas" [paginator]="true" [rows]="filtro.itensPorPagina"
         [responsive]="true" emptyMessage="Nenhuma pessoa encontrada"
         [lazy]="true" [totalRecord]="totalRegistros" (onLazyLoas)="aoMudarPagina($event)">
-          
+
           <ng-template pTemplate="header">
             <tr>
                 <th>Nome</th>
@@ -39,12 +39,14 @@
                 text-align: left;">{{p.estado}}</td>
                 <td style="width: 120px;
                 text-align: left;"
-                pTooltip="" tooltipPosition="top">{{p.status}}</td>
+                pTooltip="" tooltipPosition="top">
+                <a pButton type="button" (click)="alterarStatus(p)">{{p.status}}</a></td>
                 <td style="width: 90px; text-align: center;">
                   <a pButton type="button" icon="pi pi-pencil"
                   pTooltip="Editar" tooltipPosition="top"></a>
                   <button pButton type="button" icon="pi pi-trash"
-                  pTooltip="Excluir" tooltipPosition="top"></button>
+                  pTooltip="Excluir" tooltipPosition="top"
+                  (click)="confirmarExclusao(p)"></button>
                 </td>
             </tr>
         </ng-template>
@@ -53,7 +55,8 @@
       </div>
 
       <div class="ui-g-12">
-        <a pButton type="submit" label="Nova Pessoa"></a>
+        <a pButton type="submit" label="Nova Pessoa"
+        routerLink="/pessoas/novo"></a>
       </div>
     </div>
   </div>

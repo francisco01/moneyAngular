@@ -1,19 +1,21 @@
 <div class="container">
-  <form #lancamentoForm="ngForm" action="">
+  <form #lancamentoForm="ngForm" (ngSubmit)="salvar(lancamentoForm)" >
     <div class="ui-g">
       <div class="ui-g-12">
-        <h1>Novo Lançamentos</h1>
+        <h1>{{ titulo }} Lançamentos</h1>
       </div>
 
       <div class="ui-g-12">
-        <p-selectButton [options]="tipos" #tipo></p-selectButton>
+        <p-selectButton [options]="tipos" #tipo
+        [(ngModel)]="lancamento.tipo"></p-selectButton>
       </div>
 
       <div class="ui-g-6  ui-md-3 ui-fluid">
         <label>Vencimento</label>
         <p-calendar dateFormat="dd/mm/yy" [inline]="false"
         [readonlyInput]="true" [showIcon]="true" name="vencimento"
-        ngModel #vencimento="ngModel" required></p-calendar>
+        ngModel #vencimento="ngModel" required
+        [(ngModel)]="lancamento.dataVencimento"></p-calendar>
 
         <app-message [control]="vencimento" error="required"
           text="Informe uma data de vencimento"></app-message>
@@ -22,14 +24,16 @@
       <div class="ui-g-6 ui-md-3 ui-fluid">
         <label>{{ tipo.value === 'RECEITA' ? 'Recebimento' : 'Pagamento'}}</label>
         <p-calendar dateFormat="dd/mm/yy" [inline]="false"
-        [readonlyInput]="true" [showIcon]="true"></p-calendar>
+        [readonlyInput]="true" [showIcon]="true"
+        [(ngModel)]="lancamento.dataPagamento"></p-calendar>
       </div>
 
       <div class="ui-g-12 ui-md-9 ui-fluid">
         <label>Descrição</label>
         <input pInputText type="text" name="descricao" ngModel
           #descricao="ngModel"
-          required minlength="5">
+          required minlength="5"
+          [(ngModel)]="lancamento.descricao">
 
           <app-message [control]="descricao" error="required"
           text="Informe uma descricao"></app-message>
@@ -44,31 +48,37 @@
         <label>Valor</label>
         <input pInputText type="text" placeholder="0,00" currencyMask
         [options]="{prefix: '', thousands: '.', decimal: ','
-        ,allowNegative: false}" ngModel name="valor" required>
+        ,allowNegative: false}" ngModel name="valor" required
+        [(ngModel)]="lancamento.valor">
       </div>
 
       <div class="ui-g-12 ui-md-6 ui-fluid">
         <label>Categoria</label>
        <p-dropdown [options]="categorias" placeholder="Selecione"
-       name="categoria" ngModel required></p-dropdown>
+       name="categoria" ngModel required
+       [(ngModel)]="lancamento.categoria.codigo"></p-dropdown>
       </div>
 
       <div class="ui-g-12 ui-md-6 ui-fluid">
         <label>Pessoa</label>
         <p-dropdown [options]="pessoas" placeholder="Selecione"
-        [filter]="true" name="pessoa" ngModel required></p-dropdown>
+        [filter]="true" name="pessoa" ngModel required
+        [(ngModel)]="lancamento.pessoa.codigo"></p-dropdown>
       </div>
 
       <div class="ui-g-12 ui-fluid">
         <label>Observação</label>
-        <textarea pInputTextarea rows="3"></textarea>
+        <textarea pInputTextarea rows="3"
+        [(ngModel)]="lancamento.observacao"></textarea>
       </div>
 
       <div class="ui-g-12">
-        <button pButton type="submit" label="Salvar" [disabled]="lancamentoForm.invalid"></button>
+        <button pButton type="submit" label="Salvar"
+        [disabled]="lancamentoForm.invalid"></button>
         <button pButton type="button" label="Novo"
-        class="ui-button-info" style="margin-left: 10px;"></button>
-        <a href="#" style="margin-left: 10px;">Voltar para a pesquisa</a>
+        class="ui-button-info" style="margin-left: 10px;"
+        (click)="novo(lancamentoForm)"></button>
+        <a href="#" style="margin-left: 10px;" routerLink="/lancamentos">Voltar para a pesquisa</a>
       </div>
 
     </div>

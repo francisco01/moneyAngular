@@ -26,7 +26,8 @@ export class PessoasPesquisaComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.title.setTitle('Pesquisa de Pessoas')
+    this.title.setTitle('Pesquisa de Pessoas');
+    this.pesquisar(0);
   }
 
   pesquisar(pagina = 0) {
@@ -34,6 +35,7 @@ export class PessoasPesquisaComponent implements OnInit {
     this.filtro.pagina = pagina;
     this.pessoaService.pesquisar(this.filtro)
       .then(response => {
+        console.log("Pessoas:", response);
         const resp = response.json();
         this.pessoas = resp.content;
         //this.totalRegistros = resp.totalElements;

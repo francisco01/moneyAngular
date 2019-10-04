@@ -1,8 +1,13 @@
+import { AuthService } from './../seguranca/auth.service';
+import { Observable } from 'rxjs';
+//import { AuthHttp } from 'angular2-jwt';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpRequest } from '@angular/common/http';
 
 import * as moment from 'moment';
 import { Lancamento } from '../core/model';
+import { Options } from 'selenium-webdriver';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 
 export class LancamentoFiltro {
@@ -18,64 +23,70 @@ export class LancamentoFiltro {
 })
 export class LancamentoService {
 
+  private headers: HttpHeaders;
+  private options: HttpRequest<any>;
+  private token = '';
 
   lancamentoUrl = 'http://localhost:8080/lancamentos';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService)
+  {
+    this.token = jwtHelper.tokenGetter();
+    this.headers =
+          new HttpHeaders({ 'Authorization': 'Bearer ' + this.token, });
+      this.options = new HttpRequest<any>("HEAD", '{ headers: this.headers}');
+   }
 
-  pesquisar(filtro: LancamentoFiltro): Promise<any>{
+  pesquisar(filtro: LancamentoFiltro): Promise<any> {
 
-    const params = new URLSearchParams();
-    const headers = new Headers();
-    headers.append('Authorization', 'sfd');
+    //let httpHeaders = new HttpHeaders();
+    let params = new HttpParams()
+    .set('page', filtro.pagina.toString())
+    .set('size', filtro.itensPorPagina.toString());
 
-    params.set('page', filtro.pagina.toString());
-    params.set('size', filtro.itensPorPagina.toString());
-
-    if (filtro.descricao){
-      params.set('descricao', filtro.descricao);
+    if (filtro.descricao) {
+      params = params.set('descricao', filtro.descricao);
     }
 
-    if(filtro.dataVencimentoInicio){
-      params.set('dataVencimentoDe',
+    if (filtro.dataVencimentoInicio) {
+      params = params.set('dataVencimentoDe',
       moment(filtro.dataVencimentoInicio).format('YYYY-MM-DD'));
     }
 
-    if(filtro.dataVencimentoFim){
-      params.set('dataVencimentoAte',
+    if (filtro.dataVencimentoFim) {
+      params = params.set('dataVencimentoAte',
       moment(filtro.dataVencimentoFim).format('YYYY-MM-DD'));
     }
-    return this.http.get(`${this.lancamentoUrl}?resumo`, {search: params})
+    return this.http.get(`${this.lancamentoUrl}?resumo`,
+    {headers: this.headers, params}
+    )
     .toPromise()
     .then(response => {
-      const lancamentos = response.content;
+      const lancamentos = response;
       const resultado = {
         lancamentos,
-        total: response.totalElements
+        total: response
       };
       return resultado;
     });
   }
   excluir(codigo: number): Promise<any> {
-    return this.http.delete(`${this.lancamentoUrl}/${codigo}`)
+    return this.http.delete(`${this.lancamentoUrl}/${codigo}`, {headers: this.headers})
     .toPromise()
     .then(() => null);
   }
   salvar(lancamento: Lancamento): Promise<any> {
-    return this.http.post(`${this.lancamentoUrl}`, lancamento)
+    return this.http.post(`${this.lancamentoUrl}`, lancamento, {headers: this.headers})
     .toPromise()
     .then(response => response);
   }
   atualizar(lancamento: Lancamento): Promise<Lancamento> {
-    const headers = new Headers();
-    headers.append('Authorization', 'Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==');
-    headers.append('Content-Type', 'application/json');
 
     return this.http.put(`${this.lancamentoUrl}/${lancamento.codigo}`,
-        JSON.stringify(lancamento), { headers })
+        JSON.stringify(lancamento), {headers: this.headers})
       .toPromise()
       .then(response => {
-        const lancamentoAlterado = response.json() as Lancamento;
+        const lancamentoAlterado = response as Lancamento;
 
         this.converterStringsParaDatas([lancamentoAlterado]);
 
@@ -84,13 +95,11 @@ export class LancamentoService {
   }
 
   buscarPorCodigo(codigo: number): Promise<Lancamento> {
-    const headers = new Headers();
-    headers.append('Authorization', 'Basic YWRtaW5AYWxnYW1vbmV5LmNvbTphZG1pbg==');
 
-    return this.http.get(`${this.lancamentoUrl}/${codigo}`, { headers })
+    return this.http.get(`${this.lancamentoUrl}/${codigo}`, {headers: this.headers})
       .toPromise()
       .then(response => {
-        const lancamento = response.json() as Lancamento;
+        const lancamento = response as Lancamento;
 
         this.converterStringsParaDatas([lancamento]);
 

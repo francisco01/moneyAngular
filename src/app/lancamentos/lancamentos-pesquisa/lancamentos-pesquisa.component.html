@@ -15,12 +15,14 @@
       <div class="ui-g-12">
 
         <label style="display: block">Vencimento</label>
-        <p-calendar dateFormat="dd/mm/yy" [inputStyle]="{width: '95px''}"
-        name="vencimentoInico" [(ngModel)]="filtro.dataVencimentoInicio"></p-calendar>
+        <p-calendar dateFormat="dd/mm/yy" [inputStyle]="{width: '95px'}"
+        name="vencimentoInico" [(ngModel)]="filtro.dataVencimentoInicio"
+        ></p-calendar>
 
         <label>até</label>
-        <p-calendar dateFormat="dd/mm/yy" [inputStyle]="{width: '95px''}"
-        name="vencimentoFim" [(ngModel)]="filtro.dataVencimentoFim"></p-calendar>
+        <p-calendar dateFormat="dd/mm/yy" [inputStyle]="{width: '95px'}"
+        name="vencimentoFim" [(ngModel)]="filtro.dataVencimentoFim"
+        ></p-calendar>
       </div>
 
       <div class="ui-g-12">
@@ -35,7 +37,7 @@
     <div class="ui-g-12">
         <p-table [value]="lancamentos" [paginator]="true" [rows]="filtro.itensPorPagina"
         [responsive]="true" emptyMessage="Nenhum lancamento encontrado"
-        [lazy]="true" [totalRecord]="totalRegistros" (onLazyLoas)="aoMudarPagina($event)" #tabela>
+        [lazy]="true" [totalRecords]="totalRegistros" (onLazyLoas)="aoMudarPagina($event)" #tabela>
 
           <ng-template pTemplate="header">
             <tr>
@@ -61,7 +63,7 @@
                 <td style="width: 90px; text-align: center;">
                   <a pButton type="button" icon="pi pi-pencil"
                   pTooltip="Editar" tooltipPosition="top"
-                  [routerLink]="['/lancamentos', lan.codido]"></a>
+                  [routerLink]="['/lancamentos', lan.codigo]"></a>
                   <button pButton type="button" icon="pi pi-trash"
                   pTooltip="Excluir" tooltipPosition="top"
                   (click)="confirmarExclusao(lan)"></button>

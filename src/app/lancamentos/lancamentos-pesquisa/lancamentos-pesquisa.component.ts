@@ -26,13 +26,13 @@ export class LancamentosPesquisaComponent implements OnInit {
 
   ngOnInit() {
     this.title.setTitle('Pesquisa de lançamentos');
-    //this.pesquisar();
+    console.log("lanc", this.lancamentos);
+    this.pesquisar();
   }
 
   pesquisar(pagina = 0) {
     this.filtro.pagina = pagina;
     this.lancamentoService.pesquisar(this.filtro)
-      .toPromise()
       .then(response => {
         const resp = response.json();
         this.lancamentos = resp.content;

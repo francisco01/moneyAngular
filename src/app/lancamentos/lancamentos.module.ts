@@ -17,6 +17,7 @@ import { CalendarModule } from 'primeng/components/calendar/calendar';
 import { SelectButtonModule } from 'primeng/components/selectbutton/selectbutton';
 import { DropdownModule } from 'primeng/components/dropdown/dropdown';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
+import { LancamentosRoutingModule } from './lancamentos-routing.module';
 
 
 
@@ -29,7 +30,6 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule,
 
     InputTextModule,
     ButtonModule,
@@ -41,7 +41,8 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     DropdownModule,
     CurrencyMaskModule,
 
-    SharedModule
+    SharedModule,
+    LancamentosRoutingModule
   ],
   exports: []
 })

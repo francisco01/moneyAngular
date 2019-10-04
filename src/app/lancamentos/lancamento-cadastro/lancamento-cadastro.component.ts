@@ -63,8 +63,9 @@ export class LancamentoCadastroComponent implements OnInit {
   }
 
   carregarCategorias(){
-    this.categoriaService.listarTodas().toPromise()
+    this.categoriaService.listarTodas()
     .then(categorias => {
+      console.log("teste", categorias);
       this.categorias = categorias.map(c => {
         return { label: c.nome , value: c.codigo };
       });
@@ -74,7 +75,8 @@ export class LancamentoCadastroComponent implements OnInit {
   carregarPessoas() {
     this.pessoaService.listarTodas()
     .then(pessoas => {
-      this.pessoas = pessoas.map( p => {
+      console.log("teste 2", pessoas.content);
+      this.pessoas = pessoas.content.map( p => {
         return { label: p.nome, value: p.codigo};
       });
     }).catch(erro => this.errorHandler.handle(erro));
@@ -89,7 +91,7 @@ export class LancamentoCadastroComponent implements OnInit {
   adcionarLancamento(form: FormControl){
     this.lancamentoService.salvar(this.lancamento)
     .then((lancamentoAdd) => {
-      this.toasty.success('Lançamento adcionado com sucesso!');
+      this.toasty.success('Lançamento adicionado com sucesso!');
       //form.reset();
       //this.lancamento = new Lancamento();
       this.router.navigate(['/lancamentos', lancamentoAdd.codigo]);

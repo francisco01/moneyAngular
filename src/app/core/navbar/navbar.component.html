@@ -2,7 +2,7 @@
   <div class="container">
     <div class="ui-g">
       <div class="ui-g-12">
-        <a href="#" class="navbar-toogle"
+        <a href="javascript:;" class="navbar-toogle"
         (click)="exibindoMenu = !exibindoMenu"> <i class="pi pi-bars"></i></a>
       </div>
 
@@ -11,11 +11,11 @@
   </div>
 
   <ul class="navbar-menu" [hidden]="!exibindoMenu">
-    <li class="navbar-usuario">Teste</li>
+    <li class="navbar-usuario">{{ auth.jwtPayload?.nome }}</li>
     <li class="navbar-menuitem" routerLinkActive="ativo">
-      <a routerLink="/lancamentos">Lançamentos</a></li>
+      <a routerLink="/lancamentos" *ngIf="auth.temPermissao('ROLE_PESQUISAR_LANCAMENTOS')">Lançamentos</a></li>
     <li class="navbar-menuitem" routerLinkActive="ativo">
-      <a routerLink="/pessoas">Pessoas</a></li>
+      <a routerLink="/pessoas" *ngIf="auth.temPermissao('ROLE_PESQUISAR_PESSOAS')">Pessoas</a></li>
     <li class="navbar-menuitem" routerLinkActive="ativo">
       <a href="#">Logout</a></li>
   </ul>

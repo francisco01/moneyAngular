@@ -22,48 +22,6 @@ export class AuthService {
     this.jwtHelper.tokenGetter();
   }
 
-  refreshToken(): Observable<string> {
-    const url = 'url to refresh token here';
-
-    // append refresh token if you have one
-    const refreshToken = localStorage.getItem('refreshToken');
-    const expiredToken = localStorage.getItem('token');
-
-    return this.http
-      .get(url, {
-        headers: new HttpHeaders()
-          .set('refreshToken', refreshToken)
-          .set('token', expiredToken),
-        observe: 'response'
-      })
-      .pipe(
-        share(), // <========== YOU HAVE TO SHARE THIS OBSERVABLE TO AVOID MULTIPLE REQUEST BEING SENT SIMULTANEOUSLY
-        map(res => {
-          const token = res.headers.get('token');
-          const newRefreshToken = res.headers.get('refreshToken');
-
-          // store the new tokens
-          localStorage.setItem('refreshToken', newRefreshToken);
-          localStorage.setItem('token', token);
-
-          return token;
-        })
-      );
-  }
-
-  getToken(): Observable<string> {
-    const token = localStorage.getItem('token');
-    const isTokenExpired = this.jwtHelper.isTokenExpired(token);
-
-    if (!isTokenExpired) {
-      return of(token);
-    }
-
-    return this.refreshToken();
-  }
-
-  // other auth methods
-
   login(usuario: string, senha: string): Observable<Jwt> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -71,7 +29,7 @@ export class AuthService {
     });
     const body = `username=${usuario}&password=${senha}&grant_type=password`;
 
-    return this.http.post<Jwt>(this.oauthTokenUrl, body, { headers });
+    return this.http.post<Jwt>(this.oauthTokenUrl, body, { headers, withCredentials: true });
 
       // .subscribe(response => {
       //   let resultado = [];
@@ -108,6 +66,36 @@ export class AuthService {
     if (token) {
       this.armazenarToken(token);
     }
+  }
+
+  temPermissao(permissao: string){
+    console.log("permissão: ", this.jwtPayload.authorites.includes(permissao));
+    return this.jwtPayload && this.jwtPayload.authorites.includes(permissao);
+  }
+
+  obterNovoAcessToken():Promise<void>{
+
+    const body = 'grant_type=refresh_token';
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Basic YW5ndWxhcjpAbmd1bEByMA=='
+    });
+    
+    return this.http.post(this.oauthTokenUrl, body, { headers, withCredentials: true })
+    .toPromise()
+    .then(response => {
+     // this.armazenarToken()
+
+      this.jwtHelper.isTokenExpired()
+    }).catch(response => {
+        console.log('Erro ao renovar token', response);
+        return Promise.resolve(null);
+    });
+  }
+
+  isAccessTokenInvalido(){
+    const token = localStorage.getItem('token');
+    return !token || this.jwtHelper.isTokenExpired(token);
   }
 
 }

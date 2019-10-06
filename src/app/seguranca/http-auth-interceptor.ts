@@ -30,7 +30,7 @@ export class HttpAuthInterceptor implements HttpInterceptor {
     const authService = this.injector.get(AuthService);
 
     if (!this.inflightAuthRequest) {
-      this.inflightAuthRequest = authService.getToken();
+     // this.inflightAuthRequest = authService.getToken();
     }
 
     return this.inflightAuthRequest.pipe(
@@ -60,7 +60,7 @@ export class HttpAuthInterceptor implements HttpInterceptor {
           }
 
           if (!this.inflightAuthRequest) {
-            this.inflightAuthRequest = authService.refreshToken();
+            //this.inflightAuthRequest = authService.refreshToken();
 
             if (!this.inflightAuthRequest) {
               // remove existing tokens
